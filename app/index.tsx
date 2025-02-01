@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList } from "react-native";
+import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView } from "react-native";
 import { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 
@@ -48,33 +48,40 @@ export default function Index() {
     }
 
     return (
-      <View>
-        <Picker 
-          selectedValue={countryFilter}
-          onValueChange={setCountryFilter}
+      <SafeAreaView style={styles.container}>
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={true}
         >
-          <Picker.Item label="None" value="None" />
-          {
-            uniqueCountries.map(c => {
-              return <Picker.Item label={c} value={c} />
-            })
-          }
-        </Picker>
-        <Picker 
-          selectedValue={sortBy}
-          onValueChange={setSortBy}
-        >
-          <Picker.Item label="None" value={SortBy.None} />
-          <Picker.Item label="Creation Time (Acending)" value={SortBy.CreationTimeAscending} />
-          <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
-        </Picker>
-        <FlatList 
-          data={filteredData}
-          renderItem={({ item }) => <PersonRow user={item} />}
-          keyExtractor={(item) => item.id}
-        />
-        
-      </View>
+          <Picker 
+            selectedValue={countryFilter}
+            onValueChange={setCountryFilter}
+          >
+            <Picker.Item label="None" value="None" />
+            {
+              uniqueCountries.map(c => {
+                return <Picker.Item label={c} value={c} />
+              })
+            }
+          </Picker>
+          <Picker 
+            selectedValue={sortBy}
+            onValueChange={setSortBy}
+          >
+            <Picker.Item label="None" value={SortBy.None} />
+            <Picker.Item label="Creation Time (Acending)" value={SortBy.CreationTimeAscending} />
+            <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
+          </Picker>
+          <FlatList 
+            data={filteredData}
+            renderItem={({ item }) => <PersonRow user={item} />}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            style={styles.list}
+          />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
   return null;
@@ -83,8 +90,19 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  picker: {
+    // picker styles
+  },
+  list: {
+    // list styles
   },
   text: {
     fontSize: 25,
