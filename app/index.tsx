@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView } from "react-native";
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Pagination from "./components/Pagination";
 
@@ -29,7 +29,7 @@ const PersonRow = (props: { user: User }) => (
       </View>
       <View style={styles.column}>
         <Text style={styles.label}>Created At</Text>
-        <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleDateString()}</Text>
+        <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true, timeZoneName: 'short' })}</Text>
       </View>
     </View>
   </View>
@@ -92,7 +92,7 @@ export default function Index() {
             selectedValue={countryFilter}
             onValueChange={setCountryFilter}
           >
-            <Picker.Item label="None" value="None" />
+            <Picker.Item label="Select Country" value="None" />
             {uniqueCountries.map(c => (
               <Picker.Item key={c} label={c} value={c} />
             ))}
@@ -102,7 +102,7 @@ export default function Index() {
             selectedValue={sortBy}
             onValueChange={setSortBy}
           >
-            <Picker.Item label="None" value={SortBy.None} />
+            <Picker.Item label="Sort By" value={SortBy.None} />
             <Picker.Item label="Creation Time (Ascending)" value={SortBy.CreationTimeAscending} />
             <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
           </Picker>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    elevation: 3, // for Android shadow
+    elevation: 3,
   },
   rowContainer: {
     flexDirection: 'row',
