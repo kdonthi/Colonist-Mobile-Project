@@ -17,8 +17,21 @@ enum SortBy {
 }
 
 const PersonRow = (props: { user: User }) => (
-  <View>
-    <Text style={styles.text} id={props.user.id}>User: {props.user.userName} Country: {props.user.country} Created At: {props.user.createdAt}</Text>
+  <View style={styles.text}>
+    <View style={styles.rowContainer}>
+      <View style={styles.column}>
+        <Text style={styles.label}>User</Text>
+        <Text style={styles.value}>{props.user.userName}</Text>
+      </View>
+      <View style={styles.column}>
+        <Text style={styles.label}>Country</Text>
+        <Text style={styles.value}>{props.user.country}</Text>
+      </View>
+      <View style={styles.column}>
+        <Text style={styles.label}>Created At</Text>
+        <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleDateString()}</Text>
+      </View>
+    </View>
   </View>
 );
 
@@ -75,6 +88,7 @@ export default function Index() {
           showsVerticalScrollIndicator={true}
         >
           <Picker 
+            style={styles.picker} 
             selectedValue={countryFilter}
             onValueChange={setCountryFilter}
           >
@@ -83,7 +97,8 @@ export default function Index() {
               <Picker.Item key={c} label={c} value={c} />
             ))}
           </Picker>
-          <Picker 
+          <Picker
+            style={styles.picker} 
             selectedValue={sortBy}
             onValueChange={setSortBy}
           >
@@ -126,24 +141,53 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   picker: {
-    // picker styles
+    backgroundColor: '#f5f5f5',
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 8,
+    height: 50,
   },
   list: {
-    // list styles
+    flex: 1,
+    paddingHorizontal: 15,
+    marginVertical: 15,
   },
   text: {
-    fontSize: 25,
-    color: "black",
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: 'white',
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3, // for Android shadow
   },
-  text2: {
-    fontSize: 25,
-    color: "green",
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  about: {
-    fontSize: 25,
-    color: "blue",
-    textDecorationLine: "underline",
-  }
+  column: {
+    flex: 1,
+    paddingHorizontal: 5,
+  },
+  label: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  value: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '400',
+  },
 });
 
 
