@@ -36,7 +36,7 @@ export default function Index() {
     let countries = data.map(user => user.country);
     let uniqueCountries = [...new Set(countries)];
 
-    let filteredData = data;
+    let filteredData = [...data];
     if (countryFilter !== "None") {
       filteredData = filterByCountry(filteredData, countryFilter);
     }
