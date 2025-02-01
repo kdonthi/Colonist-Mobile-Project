@@ -9,27 +9,24 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 
 // args = callback handler, current page, total pages
 interface PaginationProps {
-    callbackHandler: (pageNumber: number) => ReactNode
+    callbackHandler: (pageNumber: number) => void
+    currentPage: number
     totalPages: number
 }
 
-export default function Pagination({callbackHandler, totalPages}: PaginationProps) {
-    const [page, setPage] = useState<number>(1);
-
+export default function Pagination({callbackHandler, currentPage, totalPages}: PaginationProps) {
     return (
-        <View>
-            {callbackHandler(page)}    
-            {
-                [...Array(totalPages)].map((i) => {
-                    return (
-                        <PageNumber
-                            pageNumber={i + 1}
-                            onClick={() => setPage(i + 1)}
-                            isCurrent={page === i + 1}
-                        />
-                    )
-                })
-            }
+        <View style={styles.container}>
+            <View style={styles.pageNumbersContainer}>
+                {[...Array(totalPages)].map((_, i) => (
+                    <PageNumber
+                        key={i + 1}
+                        pageNumber={i + 1}
+                        onClick={() => callbackHandler(i + 1)}
+                        isCurrent={currentPage === i + 1}
+                    />
+                ))}
+            </View>
         </View>
     );
 }

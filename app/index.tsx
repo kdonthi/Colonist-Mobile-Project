@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView } from "react-native";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { Picker } from '@react-native-picker/picker';
+import Pagination from "./components/Pagination";
 
 interface User {
   createdAt: string;
@@ -22,30 +23,49 @@ const PersonRow = (props: { user: User }) => (
 );
 
 export default function Index() {
-  const [data, setData] = useState<User[] | null>(null);
+  const [users, setUsers] = useState<User[] | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.None);
   const [countryFilter, setCountryFilter] = useState<string>("None");
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 20;
 
   useEffect(() => {
     fetch("https://6799ee3d747b09cdcccd06bc.mockapi.io/api/v1/users")
       .then(response => response.json())
-      .then((data: User[]) => setData(data));
+      .then((data: User[]) => {
+        setUsers(data);
+      });
   }, []);
 
-  if (data !== null) {
-    let countries = data.map(user => user.country);
+  if (!users) return (
+    <View>
+      <Text>Loading...</Text>
+    </View>
+  );
+
+  let filteredData = [...users];
+  if (countryFilter !== "None") {
+    filteredData = filterByCountry(filteredData, countryFilter);
+  }
+
+  if (sortBy === SortBy.CreationTimeAscending) {
+    filteredData = sortByCreationTime(filteredData, true);
+  } else if (sortBy === SortBy.CreationTimeDescending) {
+    filteredData = sortByCreationTime(filteredData, false);
+  }
+
+  let pageCount = Math.ceil(filteredData.length / pageSize);
+
+  const getPageData = (page: number): User[] => {
+    // Paginate the data
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredData.slice(startIndex, endIndex);
+  };
+
+  if (users !== null) {
+    let countries = users.map(user => user.country);
     let uniqueCountries = [...new Set(countries)];
-
-    let filteredData = [...data];
-    if (countryFilter !== "None") {
-      filteredData = filterByCountry(filteredData, countryFilter);
-    }
-
-    if (sortBy === SortBy.CreationTimeAscending) {
-      filteredData = sortByCreationTime(filteredData, true);
-    } else if (sortBy === SortBy.CreationTimeDescending) {
-      filteredData = sortByCreationTime(filteredData, false);
-    }
 
     return (
       <SafeAreaView style={styles.container}>
@@ -59,32 +79,39 @@ export default function Index() {
             onValueChange={setCountryFilter}
           >
             <Picker.Item label="None" value="None" />
-            {
-              uniqueCountries.map(c => {
-                return <Picker.Item label={c} value={c} />
-              })
-            }
+            {uniqueCountries.map(c => (
+              <Picker.Item key={c} label={c} value={c} />
+            ))}
           </Picker>
           <Picker 
             selectedValue={sortBy}
             onValueChange={setSortBy}
           >
             <Picker.Item label="None" value={SortBy.None} />
-            <Picker.Item label="Creation Time (Acending)" value={SortBy.CreationTimeAscending} />
+            <Picker.Item label="Creation Time (Ascending)" value={SortBy.CreationTimeAscending} />
             <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
           </Picker>
           <FlatList 
-            data={filteredData}
+            data={getPageData(page)}
             renderItem={({ item }) => <PersonRow user={item} />}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
             style={styles.list}
           />
+          <Pagination 
+            callbackHandler={(i) => setPage(i)}
+            currentPage={page}
+            totalPages={pageCount}
+          />
         </ScrollView>
       </SafeAreaView>
     );
   }
-  return null;
+  return (
+    <View>
+      <Text>Loading...</Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
