@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView, TextInput, Platform } from "react-native";
+import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView, TextInput, Platform, KeyboardAvoidingView } from "react-native";
 import { useState, useEffect } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Pagination from "./components/Pagination";
@@ -69,80 +69,87 @@ export default function Index() {
 
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.dropdownSection}>
-          <DropDownPicker
-            open={countryOpen}
-            setOpen={setCountryOpen}
-            value={countryFilter}
-            setValue={setCountryFilter}
-            items={[
-              { label: "Select Country", value: "None" },
-              ...uniqueCountries.map(c => ({ label: c, value: c }))
-            ]}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            textStyle={styles.dropdownText}
-            zIndex={3000}
-          />
-
-          <DropDownPicker
-            open={sortByOpen}
-            setOpen={setSortByOpen}
-            value={sortBy}
-            setValue={setSortBy}
-            items={[
-              { label: "Sort By", value: SortBy.None },
-              { label: "Creation Time (Ascending)", value: SortBy.CreationTimeAscending },
-              { label: "Creation Time (Descending)", value: SortBy.CreationTimeDescending }
-            ]}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            textStyle={styles.dropdownText}
-            zIndex={2000}
-          />
-
-          <DropDownPicker
-            placeholder="Results Per Page"
-            open={pageSizeOpen}
-            setOpen={setPageSizeOpen}
-            value={pageSize}
-            setValue={setPageSize}
-            items={[
-              { label: "15", value: 15 },
-              { label: "20", value: 20 },
-              { label: "25", value: 25 },
-              { label: "30", value: 30 }
-            ]}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            textStyle={styles.dropdownText}
-            zIndex={1000}
-          />
-        </View>
-
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by user name"
-          onChangeText={setSearch}
-          value={search}
-          placeholderTextColor="#94a3b8"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-
-        <FlatList 
-          data={getPageData(page)}
-          renderItem={({ item }) => <UserRow user={item} />}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-          ListFooterComponent={() => (
-            <Pagination 
-              callbackHandler={(i) => setPage(i)}
-              currentPage={page}
-              totalPages={pageCount}
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+          <View style={styles.dropdownSection}>
+            <DropDownPicker
+              open={countryOpen}
+              setOpen={setCountryOpen}
+              value={countryFilter}
+              setValue={setCountryFilter}
+              items={[
+                { label: "Select Country", value: "None" },
+                ...uniqueCountries.map(c => ({ label: c, value: c }))
+              ]}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              textStyle={styles.dropdownText}
+              zIndex={3000}
             />
-          )}
-        />
+
+            <DropDownPicker
+              open={sortByOpen}
+              setOpen={setSortByOpen}
+              value={sortBy}
+              setValue={setSortBy}
+              items={[
+                { label: "Sort By", value: SortBy.None },
+                { label: "Creation Time (Ascending)", value: SortBy.CreationTimeAscending },
+                { label: "Creation Time (Descending)", value: SortBy.CreationTimeDescending }
+              ]}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              textStyle={styles.dropdownText}
+              zIndex={2000}
+            />
+
+            <DropDownPicker
+              placeholder="Results Per Page"
+              open={pageSizeOpen}
+              setOpen={setPageSizeOpen}
+              value={pageSize}
+              setValue={setPageSize}
+              items={[
+                { label: "15", value: 15 },
+                { label: "20", value: 20 },
+                { label: "25", value: 25 },
+                { label: "30", value: 30 }
+              ]}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              textStyle={styles.dropdownText}
+              zIndex={1000}
+            />
+          </View>
+
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by user name"
+            onChangeText={setSearch}
+            value={search}
+            placeholderTextColor="#94a3b8"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          <FlatList 
+            data={getPageData(page)}
+            renderItem={({ item }) => <UserRow user={item} />}
+            keyExtractor={(item) => item.id}
+            style={styles.list}
+            keyboardShouldPersistTaps="handled"
+            ListFooterComponent={() => (
+              <Pagination 
+                callbackHandler={(i) => setPage(i)}
+                currentPage={page}
+                totalPages={pageCount}
+              />
+            )}
+          />
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
@@ -234,6 +241,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 15,
     backgroundColor: '#f1f5f9',
+    minHeight: 100,
   },
   text: {
     fontSize: 16,
