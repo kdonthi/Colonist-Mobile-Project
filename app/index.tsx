@@ -2,13 +2,9 @@ import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView } from "reac
 import { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Pagination from "./components/Pagination";
+import {User, UserRow} from "./components/User";
 
-interface User {
-  createdAt: string;
-  userName: string;
-  country: string;
-  id: string;
-}
+const usersUrl = "https://6799ee3d747b09cdcccd06bc.mockapi.io/api/v1/users";
 
 enum SortBy {
   None = "None",
@@ -16,34 +12,15 @@ enum SortBy {
   CreationTimeDescending = "Creation Time (Descending)"
 }
 
-const PersonRow = (props: { user: User }) => (
-  <View style={styles.text}>
-    <View style={styles.rowContainer}>
-      <View style={styles.column}>
-        <Text style={styles.label}>User</Text>
-        <Text style={styles.value}>{props.user.userName}</Text>
-      </View>
-      <View style={styles.column}>
-        <Text style={styles.label}>Country</Text>
-        <Text style={styles.value}>{props.user.country}</Text>
-      </View>
-      <View style={styles.column}>
-        <Text style={styles.label}>Created At</Text>
-        <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true, timeZoneName: 'short' })}</Text>
-      </View>
-    </View>
-  </View>
-);
-
 export default function Index() {
   const [users, setUsers] = useState<User[] | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.None);
   const [countryFilter, setCountryFilter] = useState<string>("None");
   const [page, setPage] = useState<number>(1);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState<number>(20);
 
   useEffect(() => {
-    fetch("https://6799ee3d747b09cdcccd06bc.mockapi.io/api/v1/users")
+    fetch(usersUrl)
       .then(response => response.json())
       .then((data: User[]) => {
         setUsers(data);
@@ -106,9 +83,22 @@ export default function Index() {
             <Picker.Item label="Creation Time (Ascending)" value={SortBy.CreationTimeAscending} />
             <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
           </Picker>
+          <Picker
+            style={styles.picker} 
+            selectedValue={pageSize}
+            onValueChange={setPageSize}
+          >
+            <Picker.Item label="Results Per Page" value={20} />
+            <Picker.Item label="5" value={5} />
+            <Picker.Item label="10" value={10} />
+            <Picker.Item label="15" value={15} />
+            <Picker.Item label="20" value={20} />
+            <Picker.Item label="25" value={25} />
+            <Picker.Item label="30" value={30} />
+          </Picker>
           <FlatList 
             data={getPageData(page)}
-            renderItem={({ item }) => <PersonRow user={item} />}
+            renderItem={({ item }) => <UserRow user={item} />}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
             style={styles.list}
@@ -122,6 +112,7 @@ export default function Index() {
       </SafeAreaView>
     );
   }
+  
   return (
     <View>
       <Text>Loading...</Text>
