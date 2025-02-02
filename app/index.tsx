@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView } from "react-native";
+import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView, TextInput } from "react-native";
 import { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import Pagination from "./components/Pagination";
@@ -18,7 +18,7 @@ export default function Index() {
   const [countryFilter, setCountryFilter] = useState<string>("None");
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(20);
-
+  const [search, setSearch] = useState<string>("");
   useEffect(() => {
     fetch(usersUrl)
       .then(response => response.json())
@@ -43,6 +43,10 @@ export default function Index() {
   } else if (sortBy === SortBy.CreationTimeDescending) {
     filteredData = sortByCreationTime(filteredData, false);
   }
+
+  if (search) {
+    filteredData = filteredData.filter(user => user.userName.toLowerCase().includes(search.toLowerCase()));
+  } 
 
   let pageCount = Math.ceil(filteredData.length / pageSize);
 
@@ -96,6 +100,12 @@ export default function Index() {
             <Picker.Item label="25" value={25} />
             <Picker.Item label="30" value={30} />
           </Picker>
+          <TextInput
+            style={styles.picker}
+            placeholder="Search by user name"
+            onChangeText={setSearch}
+            value={search}
+          />
           <FlatList 
             data={getPageData(page)}
             renderItem={({ item }) => <UserRow user={item} />}
