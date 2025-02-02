@@ -14,15 +14,12 @@ You will see a QR code in the terminal. Scan the QR code with your phone to run 
 
 You can test the app by running the app on your phone or web browser.
 
-There are two pickers in the app, the first one is for sorting the users by creation time, and the second one is for filtering the users by country, and there is also an input for the page size (default is 20). For the search input, you can search by the user name, and the search will be case insensitive! Try it all out :)
+There are two pickers in the app, the first one is for sorting the users by creation time, and the second one is for filtering the users by country, and there is also an input for the page size (default is 20). Furthermore, there is a search input, in which you can search by the user name, and the search will be case insensitive! Try it all out :)
 
 If there are multiple pages of users, you can also test the pagination by clicking on the page number at the bottom of the screen.
 
 Hopefully you enjoy testing the app!
 
-# Challenges Faced
-
-# Project Challenges & Solutions
 
 ## Technical Challenges
 
