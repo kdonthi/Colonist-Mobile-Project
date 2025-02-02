@@ -1,10 +1,10 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView, TextInput } from "react-native";
+import { Text, View, StyleSheet, FlatList, ScrollView, SafeAreaView, TextInput, Platform } from "react-native";
 import { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 import Pagination from "./components/Pagination";
-import {User, UserRow} from "./components/User";
+import UserRow, { User } from "./components/User";
 
-const usersUrl = "https://6799ee3d747b09cdcccd06bc.mockapi.io/api/v1/users";
+const USERS_URL = "https://6799ee3d747b09cdcccd06bc.mockapi.io/api/v1/users";
 
 enum SortBy {
   None = "None",
@@ -19,8 +19,14 @@ export default function Index() {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(20);
   const [search, setSearch] = useState<string>("");
+
+  // Add open states for dropdowns
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [sortByOpen, setSortByOpen] = useState(false);
+  const [pageSizeOpen, setPageSizeOpen] = useState(false);
+
   useEffect(() => {
-    fetch(usersUrl)
+    fetch(USERS_URL)
       .then(response => response.json())
       .then((data: User[]) => {
         setUsers(data);
@@ -63,62 +69,80 @@ export default function Index() {
 
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={true}
-        >
-          <Picker 
-            style={styles.picker} 
-            selectedValue={countryFilter}
-            onValueChange={setCountryFilter}
-          >
-            <Picker.Item label="Select Country" value="None" />
-            {uniqueCountries.map(c => (
-              <Picker.Item key={c} label={c} value={c} />
-            ))}
-          </Picker>
-          <Picker
-            style={styles.picker} 
-            selectedValue={sortBy}
-            onValueChange={setSortBy}
-          >
-            <Picker.Item label="Sort By" value={SortBy.None} />
-            <Picker.Item label="Creation Time (Ascending)" value={SortBy.CreationTimeAscending} />
-            <Picker.Item label="Creation Time (Descending)" value={SortBy.CreationTimeDescending} />
-          </Picker>
-          <Picker
-            style={styles.picker} 
-            selectedValue={pageSize}
-            onValueChange={setPageSize}
-          >
-            <Picker.Item label="Results Per Page" value={20} />
-            <Picker.Item label="5" value={5} />
-            <Picker.Item label="10" value={10} />
-            <Picker.Item label="15" value={15} />
-            <Picker.Item label="20" value={20} />
-            <Picker.Item label="25" value={25} />
-            <Picker.Item label="30" value={30} />
-          </Picker>
-          <TextInput
-            style={styles.picker}
-            placeholder="Search by user name"
-            onChangeText={setSearch}
-            value={search}
+        <View style={styles.dropdownSection}>
+          <DropDownPicker
+            open={countryOpen}
+            setOpen={setCountryOpen}
+            value={countryFilter}
+            setValue={setCountryFilter}
+            items={[
+              { label: "Select Country", value: "None" },
+              ...uniqueCountries.map(c => ({ label: c, value: c }))
+            ]}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            zIndex={3000}
           />
-          <FlatList 
-            data={getPageData(page)}
-            renderItem={({ item }) => <UserRow user={item} />}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            style={styles.list}
+
+          <DropDownPicker
+            open={sortByOpen}
+            setOpen={setSortByOpen}
+            value={sortBy}
+            setValue={setSortBy}
+            items={[
+              { label: "Sort By", value: SortBy.None },
+              { label: "Creation Time (Ascending)", value: SortBy.CreationTimeAscending },
+              { label: "Creation Time (Descending)", value: SortBy.CreationTimeDescending }
+            ]}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            zIndex={2000}
           />
-          <Pagination 
-            callbackHandler={(i) => setPage(i)}
-            currentPage={page}
-            totalPages={pageCount}
+
+          <DropDownPicker
+            placeholder="Results Per Page"
+            open={pageSizeOpen}
+            setOpen={setPageSizeOpen}
+            value={pageSize}
+            setValue={setPageSize}
+            items={[
+              { label: "15", value: 15 },
+              { label: "20", value: 20 },
+              { label: "25", value: 25 },
+              { label: "30", value: 30 }
+            ]}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            zIndex={1000}
           />
-        </ScrollView>
+        </View>
+
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by user name"
+          onChangeText={setSearch}
+          value={search}
+          placeholderTextColor="#94a3b8"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+
+        <FlatList 
+          data={getPageData(page)}
+          renderItem={({ item }) => <UserRow user={item} />}
+          keyExtractor={(item) => item.id}
+          style={styles.list}
+          ListFooterComponent={() => (
+            <Pagination 
+              callbackHandler={(i) => setPage(i)}
+              currentPage={page}
+              totalPages={pageCount}
+            />
+          )}
+        />
       </SafeAreaView>
     );
   }
@@ -130,18 +154,62 @@ export default function Index() {
   )
 }
 
+function filterByCountry(data: User[], country: string) : User[] {
+  return data.filter(user => user.country === country);
+}
+
+function sortByCreationTime(data: User[], ascending: boolean) {
+  if (ascending) {
+    return data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  } else {
+    return data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   scrollView: {
     flex: 1,
+    position: 'relative',
   },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 20,
+    position: 'relative',
   },
-  picker: {
+  dropdownSection: {
+    gap: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    zIndex: 3000, // This is important for dropdowns to show properly
+  },
+  dropdown: {
+    backgroundColor: '#f8fafc',
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    marginVertical: 5,
+    minHeight: 50,
+  },
+  dropdownContainer: {
+    backgroundColor: '#f8fafc',
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#334155',
+  },
+  searchInput: {
     backgroundColor: '#f8fafc',
     marginHorizontal: 10,
     marginVertical: 5,
@@ -149,6 +217,17 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: '#e2e8f0',
+    padding: 15,
+    fontSize: 16,
+    color: '#334155',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   list: {
     flex: 1,
@@ -196,16 +275,3 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-
-
-function filterByCountry(data: User[], country: string) : User[] {
-  return data.filter(user => user.country === country);
-}
-
-function sortByCreationTime(data: User[], ascending: boolean) {
-  if (ascending) {
-    return data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  } else {
-    return data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-}

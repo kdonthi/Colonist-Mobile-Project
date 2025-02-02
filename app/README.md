@@ -39,3 +39,8 @@ Hopefully you enjoy testing the app!
    - Challenge: Encountered issues where useEffect hooks were not triggering as expected
    - Solution: Referenced a working implementation from another project to resolve the issue
    - Learning: This highlighted the importance of maintaining reference implementations and proper useEffect dependency management
+
+4. **Dropdown Picker Implementation**
+   - Challenge: The default Picker component in React Native was working on my web browser, but not on my phone no matter what styling I did
+   - Solution: Utilized `react-native-dropdown-picker` to implement a fully functional dropdown picker
+   - Learning: This highlighted the importance of being flexible and realizing the important of testing on my phone :)

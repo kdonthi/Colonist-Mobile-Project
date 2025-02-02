@@ -7,24 +7,27 @@ export interface User {
     id: string;
 }
 
-export const UserRow = (props: { user: User }) => (
-<View style={styles.text}>
-    <View style={styles.rowContainer}>
-    <View style={styles.column}>
-        <Text style={styles.label}>User</Text>
-        <Text style={styles.value}>{props.user.userName}</Text>
-    </View>
-    <View style={styles.column}>
-        <Text style={styles.label}>Country</Text>
-        <Text style={styles.value}>{props.user.country}</Text>
-    </View>
-    <View style={styles.column}>
-        <Text style={styles.label}>Created At</Text>
-        <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true, timeZoneName: 'short' })}</Text>
-    </View>
-    </View>
-</View>
-);
+export default function UserRow(props: { user: User }) {
+    return (
+        <View style={styles.text}>
+            <View style={styles.rowContainer}>
+                <View style={styles.column}>
+                    <Text style={styles.label}>User</Text>
+                    <Text style={styles.value}>{props.user.userName}</Text>
+                </View>
+                <View style={styles.column}>
+                    <Text style={styles.label}>Country</Text>
+                    <Text style={styles.value}>{props.user.country}</Text>
+                </View>
+                <View style={styles.column}>
+                    <Text style={styles.label}>Created At</Text>
+                    <Text style={styles.value}>{new Date(props.user.createdAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true, timeZoneName: 'short' })}</Text>
+                </View>
+            </View>
+        </View>
+    );
+}
+
 
 const styles = StyleSheet.create({
   text: {
