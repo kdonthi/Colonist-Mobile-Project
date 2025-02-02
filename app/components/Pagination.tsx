@@ -1,13 +1,6 @@
 import { useState, ReactNode } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-// on click, do call back handler
-// page numbers equal to the number of pages given
-// current page is highlighted
-// if current page is the first page, hide the previous button
-// if current page is the last page, hide the next button
-
-// args = callback handler, current page, total pages
 interface PaginationProps {
     callbackHandler: (pageNumber: number) => void
     currentPage: number
