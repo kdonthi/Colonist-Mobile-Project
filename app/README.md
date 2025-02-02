@@ -44,3 +44,8 @@ Hopefully you enjoy testing the app!
    - Challenge: The default Picker component in React Native was working on my web browser, but not on my phone no matter what styling I did
    - Solution: Utilized `react-native-dropdown-picker` to implement a fully functional dropdown picker
    - Learning: This highlighted the importance of being flexible and realizing the important of testing on my phone :)
+ 
+ 5. **Keyboard Avoiding View**
+   - Challenge: The dropdown picker was not working because the keyboard was covering the dropdown picker
+   - Solution: Utilized `KeyboardAvoidingView` to avoid the keyboard from covering the dropdown picker
+   - Learning: Realizing that a lot of components in React Native need a more mobile friendly alternative
